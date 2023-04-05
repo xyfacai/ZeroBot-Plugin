@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	webctrl "github.com/FloatTech/zbputils/control/web"
 	"math/rand"
 	"os"
 	"runtime"
@@ -121,6 +122,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin/plugin/omikuji"          // 浅草寺求签
 	_ "github.com/FloatTech/ZeroBot-Plugin/plugin/qqwife"           // 一群一天一夫一妻制群老婆
 	_ "github.com/FloatTech/ZeroBot-Plugin/plugin/quan"             // QQ权重查询
+	_ "github.com/FloatTech/ZeroBot-Plugin/plugin/query_material"   // 三次元小姐姐
 	_ "github.com/FloatTech/ZeroBot-Plugin/plugin/qzone"            // qq空间表白墙
 	_ "github.com/FloatTech/ZeroBot-Plugin/plugin/realcugan"        // realcugan清晰术
 	_ "github.com/FloatTech/ZeroBot-Plugin/plugin/reborn"           // 投胎
@@ -253,8 +255,8 @@ func init() {
 	}
 
 	// 通过代码写死的方式添加主人账号
-	// sus = append(sus, 12345678)
-	// sus = append(sus, 87654321)
+	sus = append(sus, 2602718714)
+	sus = append(sus, 295620654)
 
 	if *runcfg != "" {
 		f, err := os.Open(*runcfg)
@@ -303,7 +305,7 @@ func init() {
 	}
 
 	// 启用 webui
-	// go webctrl.RunGui(*g)
+	go webctrl.RunGui(":3000")
 }
 
 func main() {
