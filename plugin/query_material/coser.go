@@ -18,14 +18,14 @@ import (
 
 var imgDir = "D:\\video\\固定素材\\背景图\\竖屏\\美女"
 
-var videoWorkDirs = []string{"D:\\video\\搞笑图_横屏", "D:\\video\\搞笑图_2796"}
+var videoWorkDirs = []string{"D:\\video\\搞笑图", "D:\\video\\搞笑图_4016", "D:\\video\\搞笑图_2796"}
 
 func init() {
 	control.Register("获取背景图", &ctrl.Options[*zero.Ctx]{
 		DisableOnDefault: false,
 		Brief:            "获取背景图",
 		Help:             "获取背景图 [第几期]",
-	}).ApplySingle(ctxext.DefaultSingle).OnPrefix("获取背景图").SetBlock(true).Limit(ctxext.LimitByGroup).
+	}).ApplySingle(ctxext.DefaultSingle).OnPrefix("获取背景图").SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
 			ctx.SendChain(message.Text("少女祈祷中......"))
 			searchKey, ok := ctx.State["args"].(string)
@@ -44,17 +44,23 @@ func init() {
 					break
 				}
 			}
-
+			if configFile == "" {
+				ctx.SendChain(message.Text("未找到"))
+				return
+			}
 			data, err := os.ReadFile(configFile)
 			if err != nil {
+				ctx.SendChain(message.Text("未找到"))
 				return
 			}
 			var record WorkflowRecord
 			err = json.Unmarshal(data, &record)
 			if err != nil {
+				ctx.SendChain(message.Text("未找到"))
 				return
 			}
 			bgPath := ""
+			bgPath2 := ""
 			for _, w := range record.Workflow {
 				if w.Work == "图片设置背景图" {
 					p := w.Params.(map[string]any)
@@ -64,6 +70,24 @@ func init() {
 			}
 			if bgPath == "" {
 				ctx.SendChain(message.Text("未找到"))
+				return
+			}
+			fileName := filepath.Base(bgPath)
+			// 获取源文件
+			for _, md := range record.MaterialDurations {
+				if filepath.Base(md.Material) == fileName {
+					bgPath2 = md.Material
+					break
+				}
+			}
+
+			exist, _ := PathExists(bgPath2)
+			if exist {
+				bgPath = bgPath2
+			}
+			exist, _ = PathExists(bgPath)
+			if !exist {
+				ctx.SendChain(message.Text(fmt.Sprintf("未找到：%s", searchKey)))
 				return
 			}
 
