@@ -23,7 +23,7 @@ import (
 
 var (
 	ua       = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36"
-	coserURL = "http://ovooa.com/API/cosplay/api.php"
+	coserURL = "https://ovooa.ybapi.cn/API/cosplay/api.php"
 )
 
 func init() {
@@ -43,7 +43,11 @@ func init() {
 			if err != nil {
 				return "", err
 			}
-			arr := gjson.Get(helper.BytesToString(data), "data.data").Array()
+			dataStr := helper.BytesToString(data)
+			if gjson.Get(dataStr, "code").Int() != 1 {
+				return "", errors.New(dataStr)
+			}
+			arr := gjson.Get(dataStr, "data.data").Array()
 			if len(arr) == 0 {
 				return "", errors.New("data is empty")
 			}
