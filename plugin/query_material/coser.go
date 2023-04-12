@@ -9,7 +9,9 @@ import (
 	"github.com/FloatTech/zbputils/ctxext"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
+	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -19,6 +21,8 @@ import (
 var imgDir = "D:\\video\\固定素材\\背景图\\竖屏\\美女"
 
 var videoWorkDirs = []string{"D:\\video\\搞笑图", "D:\\video\\搞笑图_4016", "D:\\video\\搞笑图_2796"}
+
+var filesMap = map[string]string{}
 
 func init() {
 	control.Register("获取背景图", &ctrl.Options[*zero.Ctx]{
@@ -33,11 +37,27 @@ func init() {
 				ctx.SendChain(message.Text("参数错误：格式为-> '获取背景图 第几期', 注意中间有空格"))
 				return
 			}
-			searchKey = strings.TrimSpace(searchKey)
+			searchKey = strings.ReplaceAll(searchKey, " ", "")
+			if bgPath, ok := filesMap[searchKey]; ok {
+				ctx.SendChain(message.Text(fmt.Sprintf("已找到：%s", searchKey)))
+				if id := ctx.Send(message.Message{ctxext.FakeSenderForwardNode(ctx,
+					message.Image("file:///"+bgPath))}).ID(); id == 0 {
+					ctx.SendChain(message.Text("ERROR: 可能被风控或下载图片用时过长，请耐心等待"))
+				}
+				return
+			}
 			//找配置文件
 			configFile := ""
 			for _, dir := range videoWorkDirs {
-				f := filepath.Join(dir, "已使用素材", "目标视频目录", searchKey+".json")
+				f := ""
+				_ = filepath.Walk(filepath.Join(dir, "已使用素材", "目标视频目录"), func(path string, info fs.FileInfo, err error) error {
+					if strings.ReplaceAll(GetFilenameNotSuffix(info.Name()), " ", "") == searchKey {
+						f = path
+						return nil
+					}
+					return nil
+				})
+
 				exist, _ := PathExists(f)
 				if exist {
 					configFile = f
@@ -90,7 +110,7 @@ func init() {
 				ctx.SendChain(message.Text(fmt.Sprintf("未找到：%s", searchKey)))
 				return
 			}
-
+			filesMap[searchKey] = bgPath
 			ctx.SendChain(message.Text(fmt.Sprintf("已找到：%s", searchKey)))
 			if id := ctx.Send(message.Message{ctxext.FakeSenderForwardNode(ctx,
 				message.Image("file:///"+bgPath))}).ID(); id == 0 {
@@ -153,4 +173,10 @@ func AnyToString(data any) string {
 		return strconv.Itoa(data.(int))
 	}
 	return data.(string)
+}
+
+func GetFilenameNotSuffix(filePath string) string {
+	baseName := filepath.Base(filePath)
+	ext := path.Ext(filePath)                // 输出 .html
+	return strings.TrimSuffix(baseName, ext) // 输出 name
 }
