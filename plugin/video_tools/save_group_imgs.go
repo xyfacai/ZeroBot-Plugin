@@ -1,26 +1,43 @@
 package video_tools
 
 import (
-	"encoding/binary"
-	"fmt"
-	"github.com/imroc/req/v3"
+	"github.com/tidwall/gjson"
 	zero "github.com/wdvxdr1123/ZeroBot"
-	"io"
-	"os"
-	"path/filepath"
-	"time"
-
-	"strings"
 )
 
 var DownloadDir = ""
 
-func init() {
-	zero.OnMessage(zero.OnlyGroup).SetBlock(true).
+func match() zero.Rule {
+	return func(ctx *zero.Ctx) bool {
+		if len(ctx.Event.Message) == 0 {
+			return false
+		}
+		for _, message := range ctx.Event.Message {
+			if message.Type != "json" {
+				continue
+			}
+			data := gjson.Parse(message.Data["data"])
+			prompt := data.Get("prompt").String()
+			if prompt != "[QQ小程序]哔哩哔哩" {
+				continue
+			}
+			bvShortUrl := data.Get("meta.detail_1.qqdocurl").String()
+			if bvShortUrl == "" {
+				continue
+			}
+			ctx.State["bv_short_url"] = bvShortUrl
+			return true
+		}
+		return false
+	}
+}
+
+/*func init() {
+	zero.OnKeyword("哔哩哔哩", match()).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
 			//ctx.SendChain(message.Text("少女祈祷中......"))
-			urls, ok := ctx.State["image_url"]
-			if !ok && len(urls.([]string)) == 0 {
+			urls, ok := ctx.State["bv_short_url"]
+			if !ok && len(urls.(string)) == 0 {
 				return
 			}
 
@@ -56,4 +73,4 @@ func init() {
 				}
 			}
 		})
-}
+}*/

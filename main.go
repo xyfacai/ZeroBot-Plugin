@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	webctrl "github.com/FloatTech/zbputils/control/web"
 	"math/rand"
 	"os"
 	"runtime"
@@ -138,7 +137,7 @@ import (
 	_ "github.com/FloatTech/ZeroBot-Plugin/plugin/tiangou"     // 舔狗日记
 	_ "github.com/FloatTech/ZeroBot-Plugin/plugin/tracemoe"    // 搜番
 	_ "github.com/FloatTech/ZeroBot-Plugin/plugin/translation" // 翻译
-	//_ "github.com/FloatTech/ZeroBot-Plugin/plugin/video_tools"      // 三次元小姐姐
+	//_ "github.com/FloatTech/ZeroBot-Plugin/plugin/video_tools" // 三次元小姐姐
 	//_ "github.com/FloatTech/ZeroBot-Plugin/plugin/vitsnyaru"     // vits猫雷
 	//_ "github.com/FloatTech/ZeroBot-Plugin/plugin/vtb_quotation" // vtb语录
 	//_ "github.com/FloatTech/ZeroBot-Plugin/plugin/vtbmusic"      // vtb点歌
@@ -308,7 +307,7 @@ func init() {
 	}
 
 	// 启用 webui
-	go webctrl.RunGui(":3000")
+	//go webctrl.RunGui(":3000")
 }
 
 func main() {
