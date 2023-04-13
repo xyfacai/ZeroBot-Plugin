@@ -12,6 +12,7 @@ import (
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
 	"io/fs"
+	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -21,7 +22,7 @@ import (
 	"time"
 )
 
-var imgDir = "D:\\video\\固定素材\\背景图\\竖屏\\美女"
+var imgDir = "D:\\video\\固定素材\\背景图\\竖屏"
 var imgDir2 = "D:\\video\\固定素材\\杂\\群相册"
 
 var videoWorkDirs = []string{"D:\\video\\搞笑图", "D:\\video\\搞笑图_4016", "D:\\video\\搞笑图_2796"}
@@ -129,15 +130,16 @@ func findVideoMaterial(ctx *zero.Ctx, searchKey string) (sourceMaterials []strin
 		ctx.SendChain(message.Text("未找到"))
 		return
 	}
-	var materials []string
+
+	materials := make(map[string]struct{})
 	for _, w := range record.Workflow {
 		if w.Work == "图片设置背景图" {
 			p := w.Params.(map[string]any)
-			materials = append(materials, AnyToString(p["dir"]))
+			materials[filepath.Base(AnyToString(p["dir"]))] = struct{}{}
 		}
 		if w.Work == "插入" {
 			p := w.Params.(map[string]any)
-			materials = append(materials, AnyToString(p["dir"]))
+			materials[filepath.Base(AnyToString(p["dir"]))] = struct{}{}
 		}
 	}
 	if len(materials) == 0 {
@@ -145,18 +147,15 @@ func findVideoMaterial(ctx *zero.Ctx, searchKey string) (sourceMaterials []strin
 		return
 	}
 
+	bgs, _ := ReadDir(imgDir)
+	imgs, _ := ReadDir(imgDir2)
+	bgs = append(bgs, imgs...)
 	// 获取源文件
-	for _, md := range materials {
-		fileName := filepath.Base(md)
-		filePath := ""
-		filepath.Walk(imgDir, func(path string, info fs.FileInfo, err error) error {
-			if info.Name() == fileName {
-				filePath = path
-			}
-			return nil
-		})
-		if filePath != "" {
-			sourceMaterials = append(sourceMaterials, filePath)
+	for _, path := range bgs {
+		fileName := filepath.Base(path)
+		if _, ok := materials[fileName]; ok {
+			sourceMaterials = append(sourceMaterials, path)
+			continue
 		}
 	}
 
@@ -223,7 +222,7 @@ func match() zero.Rule {
 			}
 
 			regex := regexp.MustCompile(`((b23|acg).tv|bili2233.cn)/[0-9a-zA-Z]+`)
-			if matched := regex.FindStringSubmatch("https://b23.tv/mzDvDet?share_medium=android&share_source=qq&bbid=XU99A819C2045E20D9AA79F5542A7C4F6572B&ts=1681390837391"); matched != nil {
+			if matched := regex.FindStringSubmatch(bvShortUrl); matched != nil {
 				ctx.State["bv_short_url"] = bvShortUrl
 				ctx.State["regex_matched"] = matched
 				return true
@@ -295,4 +294,26 @@ func GetFilenameNotSuffix(filePath string) string {
 	baseName := filepath.Base(filePath)
 	ext := path.Ext(filePath)                // 输出 .html
 	return strings.TrimSuffix(baseName, ext) // 输出 name
+}
+
+func ReadDir(root string) ([]string, error) {
+	files, err := ioutil.ReadDir(root)
+	if err != nil {
+		return nil, err
+	}
+	var allFiles []string
+	for _, file := range files {
+		if file.IsDir() {
+			subFiles, err := ReadDir(filepath.Join(root, file.Name()))
+			if err != nil {
+				return nil, err
+			}
+			if len(subFiles) > 0 {
+				allFiles = append(allFiles, subFiles...)
+			}
+		} else {
+			allFiles = append(allFiles, filepath.Join(root, file.Name()))
+		}
+	}
+	return allFiles, nil
 }
