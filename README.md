@@ -1,3 +1,4 @@
+git merge upstream master
 <div align="center">
   <img src=".github/hua_nobg_512.gif" alt="椛" width = "400">
   <br>
