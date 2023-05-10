@@ -83,11 +83,12 @@ func dynamicCard2msg(dynamicCard *bz.DynamicCard) (msg []message.MessageSegment,
 			}
 		}
 	case 8:
-		msg = append(msg, message.Text(card.Owner.Name, "在", time.Unix(int64(card.Pubdate), 0).Format("2006-01-02 15:04:05"), msgType[cType], "\n",
+		msg = append(msg, message.Text(card.Owner.Name, "在", time.Unix(int64(card.Pubdate), 0).Format("2006-01-02 15:04"), msgType[cType], "\n",
 			card.Title))
 		msg = append(msg, message.Image(card.Pic))
-		msg = append(msg, message.Text(card.Desc, "\n",
+		msg = append(msg, message.Text(
 			card.ShareSubtitle, "\n",
+			// TODO fix
 			"视频链接: ", card.ShortLink, "\n"))
 	case 16:
 		msg = append(msg, message.Text(card.User.Name, "在", time.Unix(int64(card.Item.UploadTime), 0).Format("2006-01-02 15:04:05"), msgType[cType], "\n",
