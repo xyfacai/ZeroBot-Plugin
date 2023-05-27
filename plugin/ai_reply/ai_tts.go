@@ -102,9 +102,11 @@ func (r replymode) getReplyMode(ctx *zero.Ctx) aireply.AIReply {
 		case 2:
 			k := ཆཏ.k
 			if k != "" {
-				return aireply.NewChatGPT(aireply.ChatGPTURL, k)
+				//aireply.ChatGPTURL
+				//https://api.openai.com/v1/
+				return aireply.NewChatGPT("https://api.chatanywhere.com.cn/v1/", k)
 			}
-			return aireply.NewQYK(aireply.QYKURL, aireply.QYKBotName)
+			//return aireply.NewQYK(aireply.QYKURL, aireply.QYKBotName)
 		}
 	}
 	return aireply.NewQYK(aireply.QYKURL, aireply.QYKBotName)
