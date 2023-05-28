@@ -52,8 +52,11 @@ func init() { // 插件主体
 				messageID := ctx.SendChain(message.Text(fmt.Sprintf("%s思考中，请稍等...", zero.BotConfig.NickName[0])))
 				defer ctx.DeleteMessage(messageID)
 			}
-
-			reply := message.ParseMessageFromString(aireply.Talk(ctx.Event.UserID, ctx.ExtractPlainText(), zero.BotConfig.NickName[0]))
+			sessionID := ctx.Event.UserID
+			if ctx.Event.GroupID != 0 {
+				sessionID = ctx.Event.GroupID
+			}
+			reply := message.ParseMessageFromString(aireply.Talk(sessionID, ctx.ExtractPlainText(), zero.BotConfig.NickName[0]))
 			// 回复
 			time.Sleep(time.Second * 1)
 			if zero.OnlyPublic(ctx) {
