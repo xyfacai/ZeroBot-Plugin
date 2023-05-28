@@ -35,6 +35,7 @@ require (
 	github.com/mroth/weightedrand v1.0.0
 	github.com/pkg/errors v0.9.1
 	github.com/quic-go/quic-go v0.34.0
+	github.com/sashabaranov/go-openai v1.9.5
 	github.com/shirou/gopsutil/v3 v3.23.1
 	github.com/sirupsen/logrus v1.9.0
 	github.com/tidwall/gjson v1.14.4

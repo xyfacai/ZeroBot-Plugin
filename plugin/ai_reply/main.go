@@ -18,6 +18,8 @@ import (
 
 var replmd = replymode([]string{"青云客", "小爱", "ChatGPT"})
 
+var replIdentity = ""
+
 var ttsmd = newttsmode()
 
 func init() { // 插件主体
@@ -207,4 +209,11 @@ func init() { // 插件主体
 		}
 		ctx.SendChain(message.Text("设置成功"))
 	})
+
+	ent.OnRegex(`^设置GPT角色([\s\S]*)$`, zero.OnlyGroup, zero.AdminPermission).SetBlock(true).
+		Handle(func(ctx *zero.Ctx) {
+			ident := ctx.State["regex_matched"].([]string)[1]
+			replIdentity = ident
+			ctx.SendChain(message.Text("记住啦!"))
+		})
 }

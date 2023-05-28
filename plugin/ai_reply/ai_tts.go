@@ -63,6 +63,8 @@ var (
 
 type replymode []string
 
+//var replayInst aireply.AIReply
+
 func (r replymode) setReplyMode(ctx *zero.Ctx, name string) error {
 	gid := ctx.Event.GroupID
 	if gid == 0 {
@@ -104,7 +106,7 @@ func (r replymode) getReplyMode(ctx *zero.Ctx) aireply.AIReply {
 			if k != "" {
 				//aireply.ChatGPTURL
 				//https://api.openai.com/v1/
-				return aireply.NewChatGPT("https://api.chatanywhere.com.cn/v1/", k)
+				return NewChatGPT("https://api.chatanywhere.com.cn/", k, "", replIdentity)
 			}
 			//return aireply.NewQYK(aireply.QYKURL, aireply.QYKBotName)
 		}
