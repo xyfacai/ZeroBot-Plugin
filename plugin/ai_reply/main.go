@@ -2,6 +2,7 @@
 package aireply
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 	"time"
@@ -44,6 +45,12 @@ func init() { // 插件主体
 	enr.OnMessage(zero.OnlyToMe).SetBlock(true).Limit(ctxext.LimitByUser).
 		Handle(func(ctx *zero.Ctx) {
 			aireply := replmd.getReplyMode(ctx)
+			// 获取回复
+			if aireply.String() == "ChatGPT" {
+				messageID := ctx.SendChain(message.Text(fmt.Sprintf("%s思考中，请稍等...", zero.BotConfig.NickName[0])))
+				defer ctx.DeleteMessage(messageID)
+			}
+
 			reply := message.ParseMessageFromString(aireply.Talk(ctx.Event.UserID, ctx.ExtractPlainText(), zero.BotConfig.NickName[0]))
 			// 回复
 			time.Sleep(time.Second * 1)
