@@ -33,6 +33,7 @@ require (
 	github.com/jozsefsallai/gophersauce v1.0.1
 	github.com/lithammer/fuzzysearch v1.1.5
 	github.com/mroth/weightedrand v1.0.0
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/quic-go/quic-go v0.34.0
 	github.com/sashabaranov/go-openai v1.9.5
